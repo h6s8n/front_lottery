@@ -5,6 +5,16 @@
 </template>
 
 <script setup>
+
+
+useHead({
+  script: [
+    {
+      src: 'https://telegram.org/js/telegram-web-app.js',
+      type: 'text/javascript'
+    }
+  ]
+});
 </script>
 
 <style scoped>

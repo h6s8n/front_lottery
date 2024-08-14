@@ -24,9 +24,21 @@ const route = useRoute()
 const router = useRouter()
 
 onMounted(() => {
-  if (route.query.ref) {
-    isReferral.value = true
-    referrer.value = route.query.ref
+  if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp
+    tg.ready()
+
+    const initDataUnsafe = tg.initDataUnsafe
+    if (initDataUnsafe.startPayload) {
+      isReferral.value = true
+      referrer.value = initDataUnsafe.startPayload
+    }
+  } else {
+    // Fallback for non-Telegram browsers
+    if (route.query.ref) {
+      isReferral.value = true
+      referrer.value = route.query.ref
+    }
   }
 })
 
