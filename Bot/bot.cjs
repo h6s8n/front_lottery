@@ -1,30 +1,96 @@
-const { Telegraf } = require('telegraf');
+const { Telegraf, Scenes, Markup } = require('telegraf');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
-// Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual bot token
+// تنظیمات پروکسی
+const proxyUrl = 'http://127.0.0.1:10809';
+const agent = new HttpsProxyAgent(proxyUrl);
+
+// توکن بات تلگرام
 const BOT_TOKEN = '7364233381:AAEqB8PKK4QwkkWZmc9lXICo-MeKGm9z9VI';
 if (!BOT_TOKEN) {
-    console.error('Error: Bot token is missing. Please replace YOUR_TELEGRAM_BOT_TOKEN with your actual bot token.');
+    console.error('Error: Bot token is missing.');
     process.exit(1);
 }
 
-const bot = new Telegraf(BOT_TOKEN);
+// ذخیره‌سازی موقت اطلاعات کاربران
+const userData = {};
 
-bot.start((ctx) => {
-    const referralId = ctx.startPayload; // Get the referral ID from the start payload
-    const userId = ctx.from.id; // Get the user ID
-
-    console.log(`User ID: ${userId}`);
-    console.log(`Referral ID: ${referralId}`);
-
-    // Send a message to the user with their user ID and referral ID
-    ctx.reply(`Welcome! Your user ID is ${userId} and you joined through referral ID: ${referralId}`);
+// ساخت بات و تنظیمات پروکسی
+const bot = new Telegraf(BOT_TOKEN, {
+    telegram: { agent }
 });
 
-// Start the bot
+// صفحه خانه با دکمه Web App
+const showHomePage = async (ctx) => {
+    const keyboard = Markup.keyboard([
+        [Markup.button.webApp('🏠 بازگشت به صفحه خانه', 'https://your-domain.com')]
+    ])
+    .resize()
+    .oneTime();
+
+    await ctx.reply('برای مشاهده صفحه خانه، روی دکمه زیر کلیک کنید:', keyboard);
+};
+
+// دستور شروع
+bot.start(async (ctx) => {
+    const userId = ctx.from.id;
+    const username = ctx.from.username || 'نامشخص';
+    const firstName = ctx.from.first_name || 'نامشخص';
+    const lastName = ctx.from.last_name || 'نامشخص';
+    const referralCode = ctx.startPayload;
+
+    // لاگ اطلاعات کاربر
+    console.log('=== New User Info ===');
+    console.log(`User ID: ${userId}`);
+    console.log(`Username: @${username}`);
+    console.log(`First Name: ${firstName}`);
+    console.log(`Last Name: ${lastName}`);
+    console.log(`Referral Code: ${referralCode}`);
+    console.log(`Joined At: ${new Date().toISOString()}`);
+    console.log('===================');
+
+    // ذخیره اطلاعات اولیه کاربر
+    userData[userId] = {
+        telegramId: userId,
+        username,
+        firstName,
+        lastName,
+        joinedAt: new Date().toISOString(),
+        referralCode: referralCode || null,
+        step: 'firstName'
+    };
+    
+    // پیام خوش‌آمدگویی
+    const welcomeMessage = `
+👋 به بات لاتاری خوش آمدید!
+
+🆔 شناسه شما: ${userId}
+👤 نام کاربری: @${username}
+👤 نام: ${firstName} ${lastName}
+${referralCode ? `🔗 کد رفرال: ${referralCode}` : ''}
+    `;
+    
+    await ctx.reply(welcomeMessage);
+    await showHomePage(ctx);
+});
+
+// دستور راهنما
+bot.command('help', async (ctx) => {
+    const helpMessage = `
+📚 راهنمای دستورات:
+
+/start - بازگشت به صفحه خانه
+/help - نمایش این راهنما
+    `;
+    
+    await ctx.reply(helpMessage);
+});
+
+// اجرای بات
 bot.launch()
-    .then(() => console.log('Bot is running...'))
+    .then(() => console.log('Bot is running with proxy...'))
     .catch(err => {
-        console.error('Failed to start bot:', err);
+        console.error('Failed to start bot with proxy:', err);
     });
 
 module.exports = bot;

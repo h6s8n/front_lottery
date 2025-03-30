@@ -22,12 +22,20 @@
     </div>
 
     <button @click="generateLink" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6">
-      Generate Referral Link
+      Generate Telegram Referral Link
     </button>
 
     <div v-if="referralLink" class="bg-gray-800 p-4 rounded-lg text-white">
-      <p class="mb-2">Your referral link:</p>
-      <input v-model="referralLink" readonly class="w-full bg-gray-700 text-white p-2 rounded"/>
+      <p class="mb-2">Your Telegram referral link:</p>
+      <div class="flex gap-2 mb-2">
+        <input v-model="referralLink" readonly class="flex-1 bg-gray-700 text-white p-2 rounded"/>
+        <button @click="copyLink" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Copy
+        </button>
+      </div>
+      <button @click="shareOnTelegram" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+        Share on Telegram
+      </button>
     </div>
 
     <div class="mt-6">
@@ -38,16 +46,32 @@
 </template>
 
 <script setup lang="ts">
-
+import { ref } from 'vue'
 
 const referralLink = ref('')
+const botUsername = 'LotteryAbolBot' // نام کاربری بات تلگرام
 
 const generateLink = () => {
-  referralLink.value = `https://yourapp.com/buy-card?ref=${generateRandomString()}`
+  const referralCode = generateRandomString()
+  referralLink.value = `https://t.me/${botUsername}?start=${referralCode}`
 }
 
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 10)
+}
+
+const copyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(referralLink.value)
+    alert('Link copied to clipboard!')
+  } catch (err) {
+    console.error('Failed to copy link:', err)
+    alert('Failed to copy link')
+  }
+}
+
+const shareOnTelegram = () => {
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink.value)}`, '_blank')
 }
 </script>
 
