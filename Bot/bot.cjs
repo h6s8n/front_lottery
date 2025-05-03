@@ -1,4 +1,4 @@
-const { Telegraf, Scenes, Markup } = require('telegraf');
+const { Telegraf } = require('telegraf');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
 // تنظیمات پروکسی
@@ -20,24 +20,12 @@ const bot = new Telegraf(BOT_TOKEN, {
     telegram: { agent }
 });
 
-// صفحه خانه با دکمه Web App
-const showHomePage = async (ctx) => {
-    const keyboard = Markup.keyboard([
-        [Markup.button.webApp('🏠 بازگشت به صفحه خانه', 'https://your-domain.com')]
-    ])
-    .resize()
-    .oneTime();
-
-    await ctx.reply('برای مشاهده صفحه خانه، روی دکمه زیر کلیک کنید:', keyboard);
-};
-
 // دستور شروع
 bot.start(async (ctx) => {
     const userId = ctx.from.id;
     const username = ctx.from.username || 'نامشخص';
     const firstName = ctx.from.first_name || 'نامشخص';
     const lastName = ctx.from.last_name || 'نامشخص';
-    const referralCode = ctx.startPayload;
 
     // لاگ اطلاعات کاربر
     console.log('=== New User Info ===');
@@ -45,7 +33,6 @@ bot.start(async (ctx) => {
     console.log(`Username: @${username}`);
     console.log(`First Name: ${firstName}`);
     console.log(`Last Name: ${lastName}`);
-    console.log(`Referral Code: ${referralCode}`);
     console.log(`Joined At: ${new Date().toISOString()}`);
     console.log('===================');
 
@@ -56,34 +43,25 @@ bot.start(async (ctx) => {
         firstName,
         lastName,
         joinedAt: new Date().toISOString(),
-        referralCode: referralCode || null,
         step: 'firstName'
     };
-    
-    // پیام خوش‌آمدگویی
-    const welcomeMessage = `
-👋 به بات لاتاری خوش آمدید!
 
-🆔 شناسه شما: ${userId}
-👤 نام کاربری: @${username}
-👤 نام: ${firstName} ${lastName}
-${referralCode ? `🔗 کد رفرال: ${referralCode}` : ''}
-    `;
-    
-    await ctx.reply(welcomeMessage);
-    await showHomePage(ctx);
+    // لینک وب اپ شما
+    const webAppLink = 'https://t.me/LotteryAbolBot/AbolBot'; // لینک وب اپ شما
+
+    // ارسال پیام خوش‌آمدگویی همراه با لینک وب اپ
+    await ctx.reply(`برای شروع، به صفحه خانه وب اپ بروید: ${webAppLink}`);
 });
 
-// دستور راهنما
-bot.command('help', async (ctx) => {
-    const helpMessage = `
-📚 راهنمای دستورات:
-
-/start - بازگشت به صفحه خانه
-/help - نمایش این راهنما
-    `;
-    
-    await ctx.reply(helpMessage);
+// پردازش کلیک روی لینک رفرال
+bot.on('text', async (ctx) => {
+    const referralLink = ctx.message.text;
+    // اگر لینک رفرال ارسال شد، به وب اپ هدایت می‌کنیم
+    if (referralLink.includes('t.me/LotteryAbolBot?start=')) {
+        const webAppLink = 'https://t.me/LotteryAbolBot/AbolBot'; // لینک وب اپ شما
+        // در اینجا لینک به وب اپ به طور مستقیم فرستاده میشه
+        await ctx.reply(`به وب اپ هدایت شدید: ${webAppLink}`);
+    }
 });
 
 // اجرای بات
