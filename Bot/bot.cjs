@@ -1,5 +1,6 @@
 const { Telegraf } = require('telegraf');
 const { HttpsProxyAgent } = require('https-proxy-agent');
+const axios = require('axios');
 
 // تنظیمات پروکسی
 const proxyUrl = 'http://127.0.0.1:10809';
@@ -8,7 +9,6 @@ const agent = new HttpsProxyAgent(proxyUrl);
 // توکن بات تلگرام
 const BOT_TOKEN = '7364233381:AAEqB8PKK4QwkkWZmc9lXICo-MeKGm9z9VI';
 if (!BOT_TOKEN) {
-    console.error('Error: Bot token is missing.');
     process.exit(1);
 }
 
@@ -22,35 +22,36 @@ const bot = new Telegraf(BOT_TOKEN, {
 
 // دستور شروع
 bot.start(async (ctx) => {
-    const userId = ctx.from.id;
-    const username = ctx.from.username || 'نامشخص';
-    const firstName = ctx.from.first_name || 'نامشخص';
-    const lastName = ctx.from.last_name || 'نامشخص';
-
-    // لاگ اطلاعات کاربر
-    console.log('=== New User Info ===');
-    console.log(`User ID: ${userId}`);
-    console.log(`Username: @${username}`);
-    console.log(`First Name: ${firstName}`);
-    console.log(`Last Name: ${lastName}`);
-    console.log(`Joined At: ${new Date().toISOString()}`);
-    console.log('===================');
-
-    // ذخیره اطلاعات اولیه کاربر
-    userData[userId] = {
-        telegramId: userId,
-        username,
-        firstName,
-        lastName,
-        joinedAt: new Date().toISOString(),
-        step: 'firstName'
-    };
-
-    // لینک وب اپ شما
-    const webAppLink = 'https://t.me/LotteryAbolBot/AbolBot'; // لینک وب اپ شما
-
-    // ارسال پیام خوش‌آمدگویی همراه با لینک وب اپ
-    await ctx.reply(`برای شروع، به صفحه خانه وب اپ بروید: ${webAppLink}`);
+    try {
+        // درخواست به بک‌اند برای دریافت توکن (بدون پراکسی)
+        const response = await axios.post(
+            'http://localhost:8000/api/auth/telegram',
+            { telegram_id: String(ctx.from.id) },
+            { proxy: false }
+        );
+        const token = response.data.token;
+        const webAppUrl = `https://easy-parrots-double.loca.lt/?token=${token}`;
+        await ctx.reply(
+            'برای ورود به وب‌اپ روی دکمه زیر کلیک کن:',
+            {
+                reply_markup: {
+                    keyboard: [
+                        [
+                            {
+                                text: 'ورود به وب‌اپ',
+                                web_app: { url: webAppUrl }
+                            }
+                        ]
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            }
+        );
+    } catch (error) {
+        await ctx.reply('خطا در دریافت توکن از سرور! لطفاً بعداً تلاش کنید.');
+        console.error(error);
+    }
 });
 
 // پردازش کلیک روی لینک رفرال
@@ -63,12 +64,5 @@ bot.on('text', async (ctx) => {
         await ctx.reply(`به وب اپ هدایت شدید: ${webAppLink}`);
     }
 });
-
-// اجرای بات
-bot.launch()
-    .then(() => console.log('Bot is running with proxy...'))
-    .catch(err => {
-        console.error('Failed to start bot with proxy:', err);
-    });
 
 module.exports = bot;

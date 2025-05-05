@@ -9,6 +9,12 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '~/stores/auth'
+import { onMounted } from 'vue'
+const auth = useAuthStore()
+onMounted(() => {
+  auth.loadToken()
+})
 </script>
 
 <style scoped>

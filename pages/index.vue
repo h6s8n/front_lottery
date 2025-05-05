@@ -1,6 +1,14 @@
 <template>
   <div class="container mx-auto p-6">
     <h1 class="text-2xl font-bold mb-4">Welcome to the Lottery</h1>
+    <a
+      v-if="!isLoggedIn"
+      href="https://t.me/LotteryAbolBot?start=login"
+      class="w-full bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline block text-center mb-6"
+      target="_blank"
+    >
+      Login with Telegram
+    </a>
     <div class="space-y-6">
       <!-- EuroMillions Card -->
       <div class="bg-blue-600 text-white p-6 rounded-lg flex justify-between items-center">
@@ -95,9 +103,26 @@
   </div>
 </template>
 
-
 <script setup>
-// No need for additional logic here
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+
+const isLoggedIn = ref(false)
+const auth = useAuthStore()
+
+onMounted(() => {
+  // خواندن توکن از URL
+  const params = new URLSearchParams(window.location.search)
+  const token = params.get('token')
+  if (token) {
+    auth.setToken(token)
+    isLoggedIn.value = true
+    // حذف پارامتر از URL
+    window.history.replaceState({}, document.title, '/')
+  } else if (auth.token || localStorage.getItem('auth_token')) {
+    isLoggedIn.value = true
+  }
+})
 </script>
 
 <style scoped>
