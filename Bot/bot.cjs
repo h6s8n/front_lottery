@@ -43,7 +43,7 @@ bot.start(async (ctx) => {
             { proxy: false }
         );
         const token = response.data.token;
-        const webAppUrl = `https://easy-parrots-double.loca.lt/?token=${token}`;
+        const webAppUrl = `https://front-lottery.vercel.app/?token=${token}`;
         const localWebAppUrl = `http://localhost:3000/?token=${token}`;
         await ctx.reply(
             `برای ورود به وب‌اپ روی دکمه زیر کلیک کن:\n\nاگر می‌خواهی روی لوکال تست کنی، این لینک را کپی کن و در مرورگر باز کن:\n${localWebAppUrl}`,
