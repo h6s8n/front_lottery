@@ -32,7 +32,7 @@ bot.start(async (ctx) => {
         }
         // درخواست به بک‌اند برای دریافت توکن (بدون پراکسی)
         const response = await axios.post(
-            'http://localhost:8000/api/auth/telegram',
+            'http://46.21.93.232:8000/api/auth/telegram',
             {
                 telegram_id: String(ctx.from.id),
                 username: ctx.from.username,
