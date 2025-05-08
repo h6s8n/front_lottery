@@ -1,71 +1,104 @@
 <template>
-  <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">Invite Friends</h1>
-    <p class="mb-6">Share your referral link and get rewards for every friend who joins!</p>
+  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] font-vazir p-4" dir="rtl">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-extrabold mb-4 text-shadow text-right text-white">دعوت دوستان</h1>
+      <p class="mb-6 text-lg text-white/90 text-right">لینک دعوتت رو با دوستانت به اشتراک بذار و جایزه بگیر!</p>
 
-    <div v-if="!isLoggedIn" class="mb-6">
-      <div class="bg-yellow-100 text-yellow-800 p-4 rounded">Please log in to see your referral information.</div>
-    </div>
-
-    <div v-else>
-      <div class="bg-gray-800 p-4 rounded-lg mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold text-white mb-2">Your Referral Link</h2>
-          <div class="flex gap-2 mb-2">
-            <input :value="referralLink" readonly class="flex-1 bg-gray-700 text-white p-2 rounded" />
-            <button @click="copyLink" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Copy</button>
-          </div>
-          <button @click="shareOnTelegram" class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Share on Telegram</button>
-        </div>
-        <div class="flex flex-col items-center justify-center">
-          <UIcon name="i-heroicons-gift" class="w-12 h-12 text-yellow-400 mb-2"/>
-          <span class="text-white">Invite friends and earn rewards!</span>
-        </div>
+      <div v-if="!isLoggedIn" class="mb-6">
+        <div class="bg-yellow-100/90 text-yellow-800 p-4 rounded-2xl text-right shadow-lg">برای مشاهده اطلاعات دعوت، ابتدا وارد شوید.</div>
       </div>
 
-      <div class="mt-6">
-        <h2 class="text-xl font-bold mb-4">Your Invited Friends</h2>
-        <div v-if="referrals.length === 0" class="text-gray-400">You haven't invited anyone yet.</div>
-        <ul v-else class="bg-gray-800 p-4 rounded-lg text-white">
-          <li v-for="friend in referrals" :key="friend.id" class="mb-2 flex items-center gap-2">
-            <UIcon name="i-heroicons-user" class="w-5 h-5 text-blue-400"/>
-            <span>{{ friend.first_name }} {{ friend.last_name }} <span v-if="friend.username">(@{{ friend.username }})</span></span>
-          </li>
-        </ul>
+      <div v-else>
+        <div class="bg-white/20 p-6 rounded-2xl backdrop-blur-sm mb-6 flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-4 shadow-xl">
+          <div class="flex-1">
+            <h2 class="text-xl font-bold text-white mb-2 text-right">لینک دعوت شما</h2>
+            <div class="flex gap-2 mb-2 flex-row-reverse">
+              <input :value="referralLink" readonly class="flex-1 bg-white/30 text-white p-2 rounded-lg text-right placeholder:text-white/70 focus:outline-none" />
+              <button @click="copyLink"
+                class="bg-gradient-to-r from-[#FF9F43] to-[#FF6B6B] hover:from-[#FF6B6B] hover:to-[#FF9F43] text-white px-4 py-2 rounded-lg font-bold shadow transition-all duration-300">
+                کپی
+              </button>
+            </div>
+            <button @click="shareOnTelegram"
+              class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-300">
+              اشتراک‌گذاری در تلگرام
+            </button>
+          </div>
+          <div class="flex flex-col items-center justify-center">
+            <UIcon name="i-heroicons-gift" class="w-14 h-14 text-yellow-300 mb-2 drop-shadow" />
+            <span class="text-white text-right">دوستات رو دعوت کن و جایزه بگیر!</span>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <h2 class="text-2xl font-bold mb-4 text-right text-white">دوستان دعوت‌شده شما</h2>
+          <div v-if="referrals.length === 0" class="text-white/80 text-right">هنوز کسی را دعوت نکرده‌اید.</div>
+          <div v-if="referrals.length === 0" class="text-white/80 text-right font-bold bg-white/20 rounded-xl p-4 mt-2 shadow">
+            شما هنوز دوستی را دعوت نکرده‌اید.
+          </div>
+          <ul v-else class="bg-white/20 p-4 rounded-2xl text-white text-right shadow">
+            <li v-for="friend in referrals" :key="friend.id" class="mb-2 flex items-center gap-2 flex-row-reverse">
+              <UIcon name="i-heroicons-user" class="w-5 h-5 text-blue-300" />
+              <span>
+                <template v-if="friend.first_name || friend.last_name">
+                  {{ friend.first_name || '' }} {{ friend.last_name || '' }}
+                  <span v-if="friend.username">(@{{ friend.username }})</span>
+                </template>
+                <template v-else-if="friend.username">
+                  @{{ friend.username }}
+                </template>
+                <template v-else>
+                  بدون نام ({{ friend.telegram_id ? friend.telegram_id.slice(-4) : friend.id }})
+                </template>
+              </span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '~/stores/auth'
 
 const isLoggedIn = ref(false)
-const user = ref(null)
+const user = ref<any>(null)
 const referralLink = ref('')
 const botUsername = 'LotteryAbolBot'
 const auth = useAuthStore()
-const referrals = ref([])
+const referrals = ref<any[]>([])
 const referralCode = ref('')
 
-onMounted(async () => {
-  if (auth.token) {
-    isLoggedIn.value = true
-    try {
-      const res = await axios.get('http://localhost:8000/api/user/referrals', {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      })
-      user.value = res.data.user
-      referrals.value = res.data.referrals
-      referralCode.value = res.data.referral_code
-      referralLink.value = `https://t.me/${botUsername}?start=${referralCode.value}`
-    } catch (err) {
-      isLoggedIn.value = false
+watch(
+  () => auth.token,
+  async (newToken) => {
+    isLoggedIn.value = !!newToken
+    if (newToken) {
+      try {
+        const resInvitees = await axios.get('http://localhost:8000/api/user/invitees', {
+          headers: { Authorization: `Bearer ${newToken}` }
+        })
+        referrals.value = resInvitees.data.invitees
+      } catch (err) {
+        referrals.value = []
+      }
+      try {
+        const resReferral = await axios.get('http://localhost:8000/api/user/referral-code', {
+          headers: { Authorization: `Bearer ${newToken}` }
+        })
+        referralCode.value = resReferral.data.referral_code
+        referralLink.value = `https://t.me/${botUsername}?start=${referralCode.value}`
+      } catch (err) {
+        referralCode.value = ''
+        referralLink.value = ''
+      }
     }
-  }
-})
+  },
+  { immediate: true }
+)
 
 const copyLink = async () => {
   try {
@@ -82,5 +115,7 @@ const shareOnTelegram = () => {
 </script>
 
 <style scoped>
-/* Additional styles if needed */
+.text-shadow {
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.18);
+}
 </style>

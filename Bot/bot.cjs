@@ -23,16 +23,30 @@ const bot = new Telegraf(BOT_TOKEN, {
 // دستور شروع
 bot.start(async (ctx) => {
     try {
+        // استخراج کد رفرال از start payload (اگر وجود داشته باشد)
+        let referralCode = null;
+        if (ctx.startPayload) {
+            referralCode = ctx.startPayload;
+        } else if (ctx.message && ctx.message.text && ctx.message.text.startsWith('/start ')) {
+            referralCode = ctx.message.text.split(' ')[1];
+        }
         // درخواست به بک‌اند برای دریافت توکن (بدون پراکسی)
         const response = await axios.post(
             'http://localhost:8000/api/auth/telegram',
-            { telegram_id: String(ctx.from.id) },
+            {
+                telegram_id: String(ctx.from.id),
+                username: ctx.from.username,
+                first_name: ctx.from.first_name,
+                last_name: ctx.from.last_name,
+                referral_code: referralCode
+            },
             { proxy: false }
         );
         const token = response.data.token;
         const webAppUrl = `https://easy-parrots-double.loca.lt/?token=${token}`;
+        const localWebAppUrl = `http://localhost:3000/?token=${token}`;
         await ctx.reply(
-            'برای ورود به وب‌اپ روی دکمه زیر کلیک کن:',
+            `برای ورود به وب‌اپ روی دکمه زیر کلیک کن:\n\nاگر می‌خواهی روی لوکال تست کنی، این لینک را کپی کن و در مرورگر باز کن:\n${localWebAppUrl}`,
             {
                 reply_markup: {
                     keyboard: [
@@ -63,6 +77,6 @@ bot.on('text', async (ctx) => {
         // در اینجا لینک به وب اپ به طور مستقیم فرستاده میشه
         await ctx.reply(`به وب اپ هدایت شدید: ${webAppLink}`);
     }
-});
+    });
 
 module.exports = bot;
