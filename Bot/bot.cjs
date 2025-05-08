@@ -32,7 +32,7 @@ bot.start(async (ctx) => {
         }
         // درخواست به بک‌اند برای دریافت توکن (بدون پراکسی)
         const response = await axios.post(
-            'http://46.21.93.232:8000/api/auth/telegram',
+            'https://www.monopolies.ir/api/auth/telegram',
             {
                 telegram_id: String(ctx.from.id),
                 username: ctx.from.username,

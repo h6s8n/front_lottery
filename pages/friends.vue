@@ -78,7 +78,7 @@ watch(
     isLoggedIn.value = !!newToken
     if (newToken) {
       try {
-        const resInvitees = await axios.get('http://46.21.93.232:8000/api/user/invitees', {
+        const resInvitees = await axios.get('https://www.monopolies.ir/api/user/invitees', {
           headers: { Authorization: `Bearer ${newToken}` }
         })
         referrals.value = resInvitees.data.invitees
@@ -86,7 +86,7 @@ watch(
         referrals.value = []
       }
       try {
-        const resReferral = await axios.get('http://46.21.93.232:8000/api/user/referral-code', {
+        const resReferral = await axios.get('https://www.monopolies.ir/api/user/referral-code', {
           headers: { Authorization: `Bearer ${newToken}` }
         })
         referralCode.value = resReferral.data.referral_code
