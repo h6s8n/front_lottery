@@ -8,9 +8,9 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import WinCard from '@/components/cards/Win.vue'
-import LoseCard from '@/components/cards/Lose.vue'
-import WaitCard from '@/components/cards/Wait.vue'
+import WinCard from '@/components/cards/win.vue'
+import LoseCard from '@/components/cards/lose.vue'
+import WaitCard from '@/components/cards/wait.vue'
 
 const route = useRoute()
 const status = route.query.status || 'wait'
