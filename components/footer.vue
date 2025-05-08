@@ -4,19 +4,19 @@
       <UIcon name="i-heroicons-home" class="w-6 h-6 mb-1"/>
       <span>خانه</span>
     </div>
-    <div @click="navigateTo('buy-card')" class="flex flex-col items-center cursor-pointer">
-      <UIcon name="i-heroicons-ticket" class="w-6 h-6 mb-1"/>
-      <span>خرید بلیط</span>
-    </div>
-    <div @click="navigateTo('friends')" class="flex flex-col items-center cursor-pointer">
+    <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('friends')">
       <UIcon name="i-heroicons-user-group" class="w-6 h-6 mb-1"/>
       <span>دوستان</span>
     </div>
-    <div @click="navigateTo('result')" class="flex flex-col items-center cursor-pointer">
+    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
+      <UIcon name="i-heroicons-ticket" class="w-6 h-6 mb-1"/>
+      <span>خرید بلیط</span>
+    </div>
+    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
       <UIcon name="i-heroicons-trophy" class="w-6 h-6 mb-1"/>
       <span>نتیجه</span>
     </div>
-    <div @click="navigateTo('profile')" class="flex flex-col items-center cursor-pointer">
+    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
       <UIcon name="i-heroicons-user" class="w-6 h-6 mb-1"/>
       <span>پروفایل</span>
     </div>
