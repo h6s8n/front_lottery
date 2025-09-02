@@ -6,7 +6,7 @@
       <div class="absolute bottom-20 left-1/4 w-24 h-24 bg-white/10 rounded-full animate-float"></div>
     </div>
 
-    <div class="relative z-10 container mx-auto p-4 pb-24">
+    <div class="relative container mx-auto p-4 pb-24">
 
       <div class="flex justify-between items-center bg-black/10 p-3 rounded-2xl backdrop-blur-sm border border-white/10">
         <div class="text-center">
