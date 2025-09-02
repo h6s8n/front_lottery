@@ -5,15 +5,20 @@
       <p class="mb-6 text-lg text-white/90 text-right">لینک دعوتت رو با دوستانت به اشتراک بذار و جایزه بگیر!</p>
 
       <div v-if="!isLoggedIn" class="mb-6">
-        <div class="bg-yellow-100/90 text-yellow-800 p-4 rounded-2xl text-right shadow-lg">برای مشاهده اطلاعات دعوت، ابتدا وارد شوید.</div>
+        <div
+          class="bg-white/10 text-white/90 p-4 rounded-2xl text-right shadow-lg backdrop-blur-sm border border-white/20">
+          برای مشاهده اطلاعات دعوت، ابتدا وارد شوید.
+        </div>
       </div>
 
       <div v-else>
-        <div class="bg-white/20 p-6 rounded-2xl backdrop-blur-sm mb-6 flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-4 shadow-xl">
+        <div
+          class="bg-white/20 p-6 rounded-2xl backdrop-blur-sm mb-6 flex flex-col md:flex-row-reverse md:items-center md:justify-between gap-4 shadow-xl">
           <div class="flex-1">
             <h2 class="text-xl font-bold text-white mb-2 text-right">لینک دعوت شما</h2>
             <div class="flex gap-2 mb-2 flex-row-reverse">
-              <input :value="referralLink" readonly class="flex-1 bg-white/30 text-white p-2 rounded-lg text-right placeholder:text-white/70 focus:outline-none" />
+              <input :value="referralLink" readonly
+                class="flex-1 bg-white/30 text-white p-2 rounded-lg text-right placeholder:text-white/70 focus:outline-none" />
               <button @click="copyLink"
                 class="bg-gradient-to-r from-[#FF9F43] to-[#FF6B6B] hover:from-[#FF6B6B] hover:to-[#FF9F43] text-white px-4 py-2 rounded-lg font-bold shadow transition-all duration-300">
                 کپی
@@ -33,7 +38,8 @@
         <div class="mt-6">
           <h2 class="text-2xl font-bold mb-4 text-right text-white">دوستان دعوت‌شده شما</h2>
           <div v-if="referrals.length === 0" class="text-white/80 text-right">هنوز کسی را دعوت نکرده‌اید.</div>
-          <div v-if="referrals.length === 0" class="text-white/80 text-right font-bold bg-white/20 rounded-xl p-4 mt-2 shadow">
+          <div v-if="referrals.length === 0"
+            class="text-white/80 text-right font-bold bg-white/20 rounded-xl p-4 mt-2 shadow">
             شما هنوز دوستی را دعوت نکرده‌اید.
           </div>
           <ul v-else class="bg-white/20 p-4 rounded-2xl text-white text-right shadow">
@@ -116,6 +122,6 @@ const shareOnTelegram = () => {
 
 <style scoped>
 .text-shadow {
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.18);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.18);
 }
 </style>
