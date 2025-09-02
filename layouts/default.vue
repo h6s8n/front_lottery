@@ -8,27 +8,11 @@
 </template>
 
 <script setup>
-import { useAuthStore } from '~/stores/auth'
-import { onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-const auth = useAuthStore()
-const route = useRoute()
-
-onMounted(() => {
-  auth.loadToken()
-  if (route.query.token) {
-    auth.setToken(route.query.token)
-  }
-})
-
-// اگر کاربر بین صفحات جابجا شد و توکن در query بود، باز هم ذخیره شود
-watch(() => route.query.token, (newToken) => {
-  if (newToken) {
-    auth.setToken(newToken)
-  }
-})
+// All logic has been moved to the auth.client.js plugin.
+// This script block can be removed if it's empty.
 </script>
 
 <style scoped>
 /* Additional styles if needed */
 </style>
+

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const axios = require('axios');
@@ -7,8 +8,9 @@ const proxyUrl = 'http://127.0.0.1:10809';
 const agent = new HttpsProxyAgent(proxyUrl);
 
 // توکن بات تلگرام
-const BOT_TOKEN = '7364233381:AAEqB8PKK4QwkkWZmc9lXICo-MeKGm9z9VI';
+const BOT_TOKEN = process.env.BOT_TOKEN;
 if (!BOT_TOKEN) {
+    console.error('Error: BOT_TOKEN is not defined in .env file');
     process.exit(1);
 }
 
@@ -78,5 +80,9 @@ bot.on('text', async (ctx) => {
         await ctx.reply(`به وب اپ هدایت شدید: ${webAppLink}`);
     }
     });
+
+// Launch the bot to start listening for messages
+bot.launch();
+console.log('Bot is running...');
 
 module.exports = bot;
