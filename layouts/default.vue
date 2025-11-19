@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen">
-    <main class="flex-grow pb-24"> <!-- Added padding-bottom here -->
+    <main class="flex-grow">
       <slot />
     </main>
     <Footer />

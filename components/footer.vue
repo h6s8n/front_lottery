@@ -1,24 +1,19 @@
 <template>
-  <footer class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 flex justify-around">
-    <div @click="navigateTo('/')" class="flex flex-col items-center cursor-pointer">
-      <UIcon name="i-heroicons-home" class="w-6 h-6 mb-1"/>
-      <span>خانه</span>
+  <footer class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md text-white p-2 flex justify-around border-t border-white/10 z-50">
+    <div @click="navigateTo('/')" class="flex flex-col items-center justify-center cursor-pointer transition-colors hover:text-yellow-400 p-2" :class="{ 'text-yellow-400': $route.path === '/' }">
+      <UIcon name="i-heroicons-home" class="w-7 h-7"/>
     </div>
-    <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('friends')">
-      <UIcon name="i-heroicons-user-group" class="w-6 h-6 mb-1"/>
-      <span>دوستان</span>
+    <div @click="navigateTo('/friends')" class="flex flex-col items-center justify-center cursor-pointer transition-colors hover:text-yellow-400 p-2" :class="{ 'text-yellow-400': $route.path === '/friends' }">
+      <UIcon name="i-heroicons-user-group" class="w-7 h-7"/>
     </div>
-    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
-      <UIcon name="i-heroicons-ticket" class="w-6 h-6 mb-1"/>
-      <span>خرید بلیط</span>
+    <div @click="navigateTo('/buy-card')" class="flex flex-col items-center justify-center cursor-pointer transition-colors hover:text-yellow-400 p-2" :class="{ 'text-yellow-400': $route.path === '/buy-card' }">
+      <UIcon name="i-heroicons-ticket" class="w-7 h-7"/>
     </div>
-    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
-      <UIcon name="i-heroicons-trophy" class="w-6 h-6 mb-1"/>
-      <span>نتیجه</span>
+    <div @click="navigateTo('/result')" class="flex flex-col items-center justify-center cursor-pointer transition-colors hover:text-yellow-400 p-2" :class="{ 'text-yellow-400': $route.path === '/result' }">
+      <UIcon name="i-heroicons-trophy" class="w-7 h-7"/>
     </div>
-    <div class="flex flex-col items-center opacity-50 cursor-not-allowed select-none">
-      <UIcon name="i-heroicons-user" class="w-6 h-6 mb-1"/>
-      <span>پروفایل</span>
+    <div @click="navigateTo('/profile')" class="flex flex-col items-center justify-center cursor-pointer transition-colors hover:text-yellow-400 p-2" :class="{ 'text-yellow-400': $route.path === '/profile' }">
+      <UIcon name="i-heroicons-user" class="w-7 h-7"/>
     </div>
   </footer>
 </template>
@@ -29,7 +24,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function navigateTo(page) {
-  router.push(`/${page}`)
+  router.push(page)
 }
 </script>
 
