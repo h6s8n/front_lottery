@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-sans relative overflow-hidden pb-24 select-none selection:bg-yellow-400 selection:text-black">
+
+  <div class="h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-sans relative overflow-hidden select-none selection:bg-yellow-400 selection:text-black flex flex-col">
     <!-- Background Elements -->
     <AppLoading v-if="isLoading" />
     <div class="fixed inset-0 z-0 pointer-events-none">
@@ -9,70 +10,68 @@
     </div>
 
     <!-- Header Stats (HUD Style) -->
-    <div class="relative z-10 px-4 pt-2 pb-4">
+    <div class="relative z-10 px-4 pt-4 pb-2 shrink-0">
       
       <!-- Header Stats -->
-      <div class="flex justify-between items-center mb-6">
-        <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
-          <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-lg shadow-sm">🎟️</div>
+      <div class="flex justify-between items-center mb-2">
+        <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-lg">
+          <div class="w-7 h-7 bg-yellow-400 rounded-full flex items-center justify-center text-base shadow-sm">🎟️</div>
           <div>
-            <p class="text-[10px] text-white/80 font-bold">تیکت‌های شما</p>
-            <p class="font-black text-lg text-white drop-shadow-sm">{{ tickets }}</p>
+            <p class="text-[9px] text-white/80 font-bold">تیکت‌های شما</p>
+            <p class="font-black text-base text-white drop-shadow-sm">{{ tickets }}</p>
           </div>
         </div>
         
-        <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
-          <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-lg shadow-sm">🏆</div>
+        <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-lg">
+          <div class="w-7 h-7 bg-blue-400 rounded-full flex items-center justify-center text-base shadow-sm">🏆</div>
           <div>
-            <p class="text-[10px] text-white/80 font-bold">لول {{ level }}</p>
-            <p class="font-black text-lg text-white drop-shadow-sm">{{ levelTitle }}</p>
+            <p class="text-[9px] text-white/80 font-bold">لول {{ level }}</p>
+            <p class="font-black text-base text-white drop-shadow-sm">{{ levelTitle }}</p>
           </div>
         </div>
       </div>
 
-
-
-      <!-- Main Clicker Area -->
-      <div class="flex flex-col items-center justify-center mb-2 relative w-full">
-      <div class="flex justify-between text-xs text-white/80 font-bold mb-1 w-full">
-        <span>پیشرفت سطح</span>
-        <span>{{ levelProgress }}%</span>
-      </div>
-      <div class="h-3 bg-black/10 rounded-full overflow-hidden border border-white/20 backdrop-blur-sm w-full">
-        <div 
-          class="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 transition-all duration-500 ease-out relative shadow-[0_0_10px_rgba(250,204,21,0.5)]"
-          :style="{ width: `${levelProgress}%` }"
-        >
-          <div class="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"></div>
+      <!-- Progress Bar -->
+      <div class="flex flex-col items-center justify-center relative w-full">
+        <div class="flex justify-between text-[10px] text-white/80 font-bold mb-1 w-full">
+          <span>پیشرفت سطح</span>
+          <span>{{ levelProgress }}%</span>
+        </div>
+        <div class="h-2.5 bg-black/10 rounded-full overflow-hidden border border-white/20 backdrop-blur-sm w-full">
+          <div 
+            class="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 transition-all duration-500 ease-out relative shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+            :style="{ width: `${levelProgress}%` }"
+          >
+            <div class="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"></div>
+          </div>
         </div>
       </div>
-    </div>
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 flex flex-col items-center justify-center">
+    <div class="relative z-10 flex flex-col items-center justify-center flex-1 min-h-0">
       
       <!-- Points Display (Main Counter) -->
-      <div class="flex flex-col items-center mb-1 animate-fade-in-up">
-        <div class="flex items-center gap-3">
-          <span class="text-5xl filter drop-shadow-md">🪙</span>
-          <span class="text-6xl font-black tracking-tighter text-white drop-shadow-lg font-mono">
+      <div class="flex flex-col items-center mb-2 animate-fade-in-up shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-4xl filter drop-shadow-md">🪙</span>
+          <span class="text-5xl font-black tracking-tighter text-white drop-shadow-lg font-mono">
             {{ formatNumber(points) }}
           </span>
         </div>
-        <span class="text-sm text-white/90 font-bold mt-2 tracking-widest uppercase text-[10px] bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">موجودی سکه</span>
+        <span class="text-white/90 font-bold mt-1 tracking-widest uppercase text-[9px] bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">موجودی سکه</span>
       </div>
 
       <!-- Mascot (Click Area) -->
-      <div class="relative w-80 h-80 flex items-center justify-center mb-8 select-none touch-none">
+      <div class="relative w-[65vw] h-[65vw] max-w-[280px] max-h-[280px] flex items-center justify-center mb-4 select-none touch-none shrink-0">
         <!-- Circular Glow/Border Container -->
         <div 
           class="absolute inset-0 rounded-full transition-all duration-300"
           :class="{ 'scale-95': isClicking }"
           style="
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.4), 
-                        inset 0 0 40px rgba(255, 255, 255, 0.2);
-            border: 6px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.4), 
+                        inset 0 0 30px rgba(255, 255, 255, 0.2);
+            border: 5px solid rgba(255, 255, 255, 0.3);
           "
         ></div>
 
@@ -98,7 +97,7 @@
             <div
               v-for="click in clicks"
               :key="click.id"
-              class="absolute text-4xl font-black text-white drop-shadow-md flex items-center gap-1"
+              class="absolute text-3xl font-black text-white drop-shadow-md flex items-center gap-1"
               :style="{ left: click.x + 'px', top: click.y + 'px' }"
             >
               <span class="text-yellow-300 drop-shadow-sm">+{{ clickAmount }}</span>
@@ -108,32 +107,55 @@
       </div>
 
       <!-- Action Buttons Grid -->
-      <div class="w-full px-6 grid grid-cols-2 gap-3 mb-24">
+      <div class="w-full px-6 grid grid-cols-2 gap-3 mb-4 shrink-0">
         <!-- Invite Button -->
         <button 
           @click="shareOnTelegram"
-          class="group relative overflow-hidden bg-white/20 backdrop-blur-md p-4 rounded-3xl border border-white/40 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white/30"
+          class="group relative overflow-hidden bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/40 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white/30"
         >
-          <div class="flex flex-col items-center gap-2 relative z-10">
-            <div class="bg-blue-500/20 p-2 rounded-2xl">
-              <UIcon name="i-heroicons-users" class="w-8 h-8 text-blue-100 drop-shadow-sm" />
+          <div class="flex flex-col items-center gap-1 relative z-10">
+            <div class="bg-blue-500/20 p-1.5 rounded-xl">
+              <UIcon name="i-heroicons-users" class="w-6 h-6 text-blue-100 drop-shadow-sm" />
             </div>
-            <span class="font-bold text-sm text-white">دعوت از دوستان</span>
+            <span class="font-bold text-xs text-white">دعوت دوستان</span>
           </div>
         </button>
 
         <!-- Convert Button -->
         <button 
           @click="isConvertModalOpen = true"
-          class="group relative overflow-hidden bg-white/20 backdrop-blur-md p-4 rounded-3xl border border-white/40 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white/30"
+          class="group relative overflow-hidden bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/40 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white/30"
         >
-          <div class="flex flex-col items-center gap-2 relative z-10">
-            <div class="bg-purple-500/20 p-2 rounded-2xl">
-              <UIcon name="i-heroicons-ticket" class="w-8 h-8 text-purple-100 drop-shadow-sm" />
+          <div class="flex flex-col items-center gap-1 relative z-10">
+            <div class="bg-purple-500/20 p-1.5 rounded-xl">
+              <UIcon name="i-heroicons-ticket" class="w-6 h-6 text-purple-100 drop-shadow-sm" />
             </div>
-            <span class="font-bold text-sm text-white">تبدیل سکه به بلیط</span>
+            <span class="font-bold text-xs text-white">تبدیل سکه</span>
           </div>
         </button>
+      </div>
+      
+      <!-- Energy Bar -->
+      <div class="w-full px-4 mb-20 shrink-0">
+        <div class="bg-white/20 backdrop-blur-xl rounded-3xl p-1.5 border border-white/40 shadow-2xl flex items-center justify-between pr-4 pl-1.5 h-14">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-yellow-400/30 flex items-center justify-center border border-yellow-400/20">
+              <span class="text-lg animate-pulse">⚡</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[9px] text-white/80 font-bold uppercase tracking-wider">انرژی</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-base font-black text-white font-mono drop-shadow-sm">{{ energy }}</span>
+                <span class="text-[9px] text-white/60 font-mono font-bold">/ {{ maxEnergy }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <button class="h-10 px-4 bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200 text-black text-xs font-black rounded-2xl transition-all shadow-lg shadow-yellow-400/30 flex items-center gap-1.5 active:scale-95">
+            <UIcon name="i-heroicons-bolt" class="w-4 h-4" />
+            <span>شارژ</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -172,29 +194,8 @@
       </div>
     </UModal>
 
-    <!-- Bottom Stats Bar -->
-    <div class="fixed bottom-24 left-4 right-4 z-40">
-      <div class="bg-white/20 backdrop-blur-xl rounded-3xl p-1.5 border border-white/40 shadow-2xl flex items-center justify-between pr-4 pl-1.5 h-16">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-yellow-400/30 flex items-center justify-center border border-yellow-400/20">
-            <span class="text-xl animate-pulse">⚡</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-[10px] text-white/80 font-bold uppercase tracking-wider">انرژی</span>
-            <div class="flex items-baseline gap-1">
-              <span class="text-lg font-black text-white font-mono drop-shadow-sm">{{ energy }}</span>
-              <span class="text-[10px] text-white/60 font-mono font-bold">/ {{ maxEnergy }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <button class="h-12 px-6 bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200 text-black text-sm font-black rounded-2xl transition-all shadow-lg shadow-yellow-400/30 flex items-center gap-2 active:scale-95">
-          <UIcon name="i-heroicons-bolt" class="w-5 h-5" />
-          <span>شارژ</span>
-        </button>
-      </div>
+
     </div>
-  </div>
 </template>
 
 <script setup>
