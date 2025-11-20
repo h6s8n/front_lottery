@@ -1,0 +1,363 @@
+<template>
+  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-sans relative overflow-hidden pb-24 selection:bg-yellow-400 selection:text-black">
+    <!-- Background Elements -->
+    <AppLoading v-if="isLoading" />
+    <div class="fixed inset-0 z-0 pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-white/20 rounded-full blur-[100px] animate-pulse"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-yellow-300/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+      <div class="absolute top-[40%] left-[20%] w-[20%] h-[20%] bg-white/10 rounded-full blur-[60px]"></div>
+    </div>
+
+    <div class="relative z-10 px-4 pt-6 pb-32">
+      <!-- Header Section -->
+      <div class="text-center mb-8">
+        <div class="inline-block p-1 rounded-full bg-white/30 backdrop-blur-sm mb-4 shadow-lg border border-white/20">
+          <div class="bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full p-4 w-24 h-24 flex items-center justify-center shadow-inner">
+            <span class="text-6xl filter drop-shadow-md transform hover:scale-110 transition-transform duration-300">🎁</span>
+          </div>
+        </div>
+        <h1 class="text-3xl font-black mb-2 text-white drop-shadow-md tracking-tight">کسب درآمد</h1>
+        <p class="text-white/90 text-sm font-bold">ماموریت‌ها رو انجام بده و سکه جمع کن! ✨</p>
+      </div>
+
+      <!-- Daily Rewards Section -->
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-3 px-2">
+          <h2 class="font-bold text-white flex items-center gap-2 drop-shadow-sm">
+            <span class="w-2 h-6 bg-yellow-400 rounded-full shadow-sm"></span>
+            جایزه روزانه
+          </h2>
+          <span class="text-xs text-white/80 font-bold cursor-pointer hover:text-white transition-colors bg-white/20 px-2 py-1 rounded-lg">مشاهده همه</span>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
+          <div 
+            v-for="(day, index) in 7" 
+            :key="index"
+            class="min-w-[72px] h-24 rounded-2xl flex flex-col items-center justify-center gap-1 border transition-all relative overflow-hidden group shadow-lg"
+            :class="index === 0 ? 'bg-white/30 border-white/40 backdrop-blur-md transform scale-105' : 'bg-white/10 border-white/20 backdrop-blur-sm opacity-80'"
+          >
+            <div class="text-[10px] font-bold text-white/80 mb-1">روز {{ index + 1 }}</div>
+            <div class="text-2xl mb-1 drop-shadow-sm">{{ index === 0 ? '⚡' : '🔒' }}</div>
+            <div class="text-xs font-black" :class="index === 0 ? 'text-yellow-300' : 'text-white/60'">
+              {{ formatNumber((index + 1) * 500) }}
+            </div>
+            <!-- Active Indicator -->
+            <div v-if="index === 0" class="absolute bottom-0 left-0 right-0 h-1 bg-yellow-400"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Categories (Tabs) -->
+      <div class="flex p-1.5 bg-white/20 backdrop-blur-md rounded-2xl mb-6 border border-white/20 shadow-lg">
+        <button 
+          v-for="tab in ['همه', 'ویژه', 'شبکه‌های اجتماعی', 'دوستان']" 
+          :key="tab"
+          @click="activeTab = tab"
+          class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 relative z-10"
+          :class="activeTab === tab ? 'text-pink-600 shadow-md bg-white' : 'text-white/80 hover:text-white hover:bg-white/10'"
+        >
+          {{ tab }}
+        </button>
+      </div>
+
+      <!-- Tasks List -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Real Tasks -->
+        <div 
+          v-for="task in filteredTasks" 
+          :key="task.id"
+          class="group bg-white/20 backdrop-blur-md border border-white/30 rounded-[20px] p-3 flex flex-col justify-between hover:bg-white/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative overflow-hidden"
+        >
+          <!-- Top Section -->
+          <div class="flex items-start gap-3 mb-2">
+            <!-- Cat Image (Top Left) -->
+            <div class="w-10 h-10 rounded-full overflow-hidden shadow-md bg-white/40 p-0.5 flex-shrink-0">
+              <img 
+                :src="`https://robohash.org/${task.id}?set=set4&bgset=bg1&size=100x100`" 
+                alt="Task Icon" 
+                class="w-full h-full object-cover rounded-full"
+              >
+            </div>
+
+            <!-- Title & Reward (Right) -->
+            <div class="flex flex-col min-w-0">
+              <h3 class="font-black text-[11px] text-white drop-shadow-sm leading-tight mb-1 line-clamp-2 h-8">{{ task.title }}</h3>
+              <div class="flex flex-col">
+                <span class="text-[9px] text-white/60 font-bold">پاداش</span>
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px]">{{ task.reward_type === 'ticket' ? '🎟️' : '🪙' }}</span>
+                  <span class="text-yellow-300 font-black text-xs drop-shadow-sm">+{{ formatNumber(task.reward_amount) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px bg-white/20 w-full my-2"></div>
+
+          <!-- Bottom Section -->
+          <div class="flex items-center justify-between h-8">
+            <!-- Level/Info (Left) -->
+            <div class="flex items-center h-full border-l border-white/20 pl-2">
+              <span class="text-[10px] font-bold text-white/80">Lvl 1</span>
+            </div>
+
+            <!-- Action Button (Right) -->
+            <button 
+              @click="handleTaskAction(task)"
+              :disabled="task.status === 'claimed' || taskStates[task.id]?.loading"
+              class="flex-1 h-full flex items-center justify-end gap-1 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed pl-2"
+              :class="task.status === 'claimed' ? 'text-green-300' : 'text-white'"
+            >
+              <span v-if="taskStates[task.id]?.loading" class="animate-spin ml-1">⏳</span>
+              <span v-else-if="task.status === 'claimed'">✅ انجام شد</span>
+              <span v-else class="flex items-center gap-1">
+                <span class="text-lg">👉</span>
+                <span>انجام بده</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Static/Coming Soon Tasks -->
+        <div v-if="activeTab === 'همه' || activeTab === 'ویژه'" class="opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+          <div class="bg-white/10 border border-white/20 rounded-[20px] p-3 flex flex-col justify-between h-full backdrop-blur-sm">
+            <!-- Top Section -->
+            <div class="flex items-start gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full overflow-hidden shadow-md bg-white/20 p-0.5 flex-shrink-0">
+                <img src="https://robohash.org/wallet?set=set4&bgset=bg1&size=100x100" class="w-full h-full object-cover rounded-full">
+              </div>
+              <div class="flex flex-col min-w-0">
+                <h3 class="font-black text-[11px] text-white/80 leading-tight mb-1 line-clamp-2 h-8">اتصال کیف پول</h3>
+                <div class="flex flex-col">
+                  <span class="text-[9px] text-white/40 font-bold">پاداش</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px]">🪙</span>
+                    <span class="text-yellow-300/80 font-black text-xs">+1M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-white/10 w-full my-2"></div>
+
+            <!-- Bottom Section -->
+            <div class="flex items-center justify-between h-8">
+              <div class="flex items-center h-full border-l border-white/10 pl-2">
+                <span class="text-[10px] font-bold text-white/40">Lvl 10</span>
+              </div>
+              <div class="flex-1 h-full flex items-center justify-end gap-1 pl-2">
+                <span class="text-[10px] font-bold text-white/40">🔒 قفل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'همه' || activeTab === 'دوستان'" class="opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+          <div class="bg-white/10 border border-white/20 rounded-[20px] p-3 flex flex-col justify-between h-full backdrop-blur-sm">
+            <!-- Top Section -->
+            <div class="flex items-start gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full overflow-hidden shadow-md bg-white/20 p-0.5 flex-shrink-0">
+                <img src="https://robohash.org/friends?set=set4&bgset=bg1&size=100x100" class="w-full h-full object-cover rounded-full">
+              </div>
+              <div class="flex flex-col min-w-0">
+                <h3 class="font-black text-[11px] text-white/80 leading-tight mb-1 line-clamp-2 h-8">دعوت از ۱۰ دوست</h3>
+                <div class="flex flex-col">
+                  <span class="text-[9px] text-white/40 font-bold">پاداش</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px]">🪙</span>
+                    <span class="text-yellow-300/80 font-black text-xs">+500K</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-white/10 w-full my-2"></div>
+
+            <!-- Bottom Section -->
+            <div class="flex items-center justify-between h-8">
+              <div class="flex items-center h-full border-l border-white/10 pl-2">
+                <span class="text-[10px] font-bold text-white/40">Lvl 5</span>
+              </div>
+              <div class="flex-1 h-full flex items-center justify-end gap-1 pl-2">
+                <div class="w-full h-1.5 bg-black/20 rounded-full overflow-hidden">
+                  <div class="w-1/3 h-full bg-yellow-400"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import axios from 'axios'
+import { useAuthStore } from '~/stores/auth'
+
+definePageMeta({
+  middleware: 'auth'
+})
+
+const auth = useAuthStore()
+const config = useRuntimeConfig()
+
+// State
+const taskStates = ref({})
+const activeTab = ref('همه')
+
+// Data Fetching
+const { data: tasks, pending: isLoading, refresh } = await useFetch(`${config.public.apiBase}/tasks`, {
+  headers: { Authorization: `Bearer ${auth.token}` },
+  immediate: !!auth.token,
+  watch: [() => auth.token]
+})
+
+// Computed
+const filteredTasks = computed(() => {
+  if (!tasks.value) return []
+  if (activeTab.value === 'همه') return tasks.value
+  
+  return tasks.value.filter(task => {
+    if (activeTab.value === 'شبکه‌های اجتماعی') return ['telegram_join', 'social_link'].includes(task.type)
+    if (activeTab.value === 'ویژه') return task.reward_amount > 5000
+    if (activeTab.value === 'دوستان') return task.type === 'referral_count'
+    return true
+  })
+})
+
+// Methods
+const formatNumber = (num) => {
+  return new Intl.NumberFormat('fa-IR').format(num)
+}
+
+const getIcon = (iconType) => {
+  const icons = {
+    telegram: '✈️',
+    instagram: '📷',
+    youtube: '▶️',
+    twitter: '🐦',
+  }
+  return icons[iconType] || '⭐'
+}
+
+const getIconGradient = (iconType) => {
+  const gradients = {
+    telegram: 'linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)',
+    instagram: 'linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%)',
+    youtube: 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)',
+    twitter: 'linear-gradient(135deg, #1DA1F2 0%, #0C85D0 100%)',
+  }
+  return gradients[iconType] || 'linear-gradient(135deg, #FACC15 0%, #EC4899 100%)'
+}
+
+const getButtonClass = (task) => {
+  if (task.status === 'claimed') {
+    return 'bg-white/20 border border-green-400/50 text-green-100 cursor-not-allowed'
+  }
+  
+  const state = taskStates.value[task.id]
+  if (state?.loading) {
+    return 'bg-white/20 text-white cursor-wait border border-white/20'
+  }
+  if (state?.timer > 0) {
+    return 'bg-white/10 text-white/60 border border-white/10'
+  }
+  if (state?.readyToClaim) {
+    return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg shadow-green-400/30 border border-green-300/20 transform hover:scale-105'
+  }
+  
+  return 'bg-white text-pink-600 hover:bg-pink-50 shadow-lg shadow-pink-500/10 border border-white/50'
+}
+
+const getButtonText = (task) => {
+  if (task.status === 'claimed') return 'انجام شد'
+  
+  const state = taskStates.value[task.id]
+  if (state?.loading) return 'بررسی...'
+  if (state?.timer > 0) return `${state.timer}s`
+  if (state?.readyToClaim) return 'دریافت'
+  
+  return 'شروع'
+}
+
+const handleTaskAction = async (task) => {
+  if (task.status === 'claimed') return
+  
+  const state = taskStates.value[task.id]
+  
+  if (state?.readyToClaim) {
+    await claimTask(task)
+    return
+  }
+  
+  await startTask(task)
+}
+
+const startTask = async (task) => {
+  if (!taskStates.value[task.id]) {
+    taskStates.value[task.id] = { loading: false, timer: 0, readyToClaim: false }
+  }
+  
+  if (task.type === 'telegram_join') {
+    window.open(task.link.startsWith('@') ? `https://t.me/${task.link.substring(1)}` : task.link, '_blank')
+    
+    setTimeout(async () => {
+      taskStates.value[task.id].loading = true
+      try {
+        await axios.post(`${config.public.apiBase}/tasks/${task.id}/check`, {}, {
+          headers: { Authorization: `Bearer ${auth.token}` }
+        })
+        taskStates.value[task.id].readyToClaim = true
+      } catch (error) {
+        alert('لطفاً ابتدا عضو کانال شوید.')
+      } finally {
+        taskStates.value[task.id].loading = false
+      }
+    }, 2000)
+    
+  } else if (task.type === 'social_link') {
+    window.open(task.link, '_blank')
+    
+    taskStates.value[task.id].timer = 20
+    const interval = setInterval(() => {
+      if (taskStates.value[task.id].timer > 0) {
+        taskStates.value[task.id].timer--
+      } else {
+        clearInterval(interval)
+        taskStates.value[task.id].readyToClaim = true
+      }
+    }, 1000)
+  }
+}
+
+const claimTask = async (task) => {
+  taskStates.value[task.id].loading = true
+  try {
+    await axios.post(`${config.public.apiBase}/tasks/${task.id}/claim`, {}, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    
+    alert('🎉 جایزه با موفقیت دریافت شد!')
+    refresh()
+  } catch (error) {
+    alert('خطا در دریافت جایزه. لطفاً دوباره تلاش کنید.')
+  } finally {
+    taskStates.value[task.id].loading = false
+  }
+}
+</script>
+
+<style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>

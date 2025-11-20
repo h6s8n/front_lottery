@@ -63,13 +63,16 @@ async function main() {
         try {
             // استخراج کد رفرال از start payload (اگر وجود داشته باشد)
             let referralCode = null;
-            if (ctx.startPayload) {
+            if (ctx.startPayload && ctx.startPayload !== 'login') {
                 referralCode = ctx.startPayload;
             } else if (ctx.message && ctx.message.text && ctx.message.text.startsWith('/start ')) {
-                referralCode = ctx.message.text.split(' ')[1];
+                const parts = ctx.message.text.split(' ');
+                if (parts[1] && parts[1] !== 'login') {
+                    referralCode = parts[1];
+                }
             }
             // درخواست به بک‌اند برای دریافت توکن (بدون پراکسی)
-            const apiUrl = process.env.API_URL || 'https://www.monopolies.ir/api/auth/telegram';
+            const apiUrl = process.env.API_URL || 'http://127.0.0.1:8000/api/auth/telegram';
             console.log('Sending request to:', apiUrl);
 
             const response = await axios.post(

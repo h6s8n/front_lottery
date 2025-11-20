@@ -1,71 +1,108 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-vazir overflow-x-hidden selection:bg-yellow-400 selection:text-black" dir="rtl">
+  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-sans overflow-x-hidden selection:bg-yellow-400 selection:text-black pb-24">
     
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-500/20 rounded-full blur-[100px] animate-pulse-slow"></div>
-      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-yellow-500/20 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
+      <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-white/20 rounded-full blur-[100px] animate-pulse"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-yellow-300/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
     </div>
 
-    <div class="relative container mx-auto px-4 py-6 pb-32 max-w-md flex flex-col items-center justify-center min-h-[80vh]">
+    <div class="relative container mx-auto px-4 py-6 max-w-md">
       
-      <!-- WIN STATE -->
-      <div v-if="status === 'win'" class="w-full bg-black/20 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl text-center animate-bounce-slow">
-        <div class="w-32 h-32 mx-auto bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-yellow-500/50">
-          <span class="text-6xl">🏆</span>
-        </div>
-        <h2 class="text-3xl font-black text-yellow-300 mb-2">تبریک!</h2>
-        <p class="text-white/90 text-lg mb-6">شما برنده شدید!</p>
-        <div class="bg-white/10 rounded-xl p-4 mb-6">
-          <p class="text-sm text-white/70 mb-1">مبلغ جایزه</p>
-          <p class="text-2xl font-mono font-bold text-green-400">50,000,000 تومان</p>
-        </div>
-        <button class="w-full py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-xl shadow-lg transition-transform active:scale-95">
-          دریافت جایزه
-        </button>
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-black text-white drop-shadow-md mb-2">نتایج قرعه‌کشی</h1>
+        <p class="text-white/90 text-sm font-bold">لیست برندگان خوش‌شانس! 🏆</p>
       </div>
 
-      <!-- LOSE STATE -->
-      <div v-else-if="status === 'lose'" class="w-full bg-black/20 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl text-center">
-        <div class="w-24 h-24 mx-auto bg-gray-700/50 rounded-full flex items-center justify-center mb-6 grayscale">
-          <span class="text-5xl">😔</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">متاسفیم</h2>
-        <p class="text-white/70 mb-6">شما در این قرعه‌کشی برنده نشدید.</p>
-        <button @click="navigateTo('/buy-card')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/10 transition-transform active:scale-95">
-          خرید بلیط جدید
-        </button>
+      <div v-if="loading" class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
       </div>
 
-      <!-- WAIT STATE -->
-      <div v-else class="w-full bg-black/20 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl text-center">
-        <div class="w-24 h-24 mx-auto bg-blue-500/20 rounded-full flex items-center justify-center mb-6 animate-pulse">
-          <span class="text-5xl">⏳</span>
+      <div v-else-if="history.length === 0" class="text-center py-12 opacity-80">
+        <div class="bg-white/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-inner">
+          <span class="text-4xl">📭</span>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">در انتظار قرعه‌کشی</h2>
-        <p class="text-white/70 mb-6">نتایج هنوز اعلام نشده است.</p>
-        <div class="bg-white/10 rounded-xl p-3 mb-4 flex justify-between items-center">
-          <span class="text-sm">زمان باقی‌مانده</span>
-          <span class="font-mono font-bold text-yellow-300">04:23:12</span>
+        <p class="text-white font-bold text-lg">هنوز قرعه‌کشی انجام نشده!</p>
+      </div>
+
+      <div v-else class="space-y-4">
+        <div v-for="(lottery, index) in history" :key="lottery.id" 
+             class="bg-white/20 backdrop-blur-md border border-white/30 rounded-[24px] p-5 shadow-xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+          
+          <!-- Winner Badge -->
+          <div class="absolute top-0 left-0 bg-yellow-400 text-black text-[10px] font-black px-3 py-1 rounded-br-xl shadow-sm z-10">
+            #{{ lottery.id }}
+          </div>
+
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full flex items-center justify-center text-2xl shadow-lg border-2 border-white/30">
+              👑
+            </div>
+            <div>
+              <p class="text-xs text-white/80 font-bold mb-1">برنده خوش‌شانس</p>
+              <h3 class="font-black text-lg text-white drop-shadow-sm">
+                {{ lottery.winner ? `${lottery.winner.first_name} ${lottery.winner.last_name}` : 'هنوز مشخص نشده' }}
+              </h3>
+              <p class="text-[10px] text-white/60 font-mono dir-ltr" v-if="lottery.winner">@{{ lottery.winner.username }}</p>
+            </div>
+          </div>
+
+          <div class="bg-black/10 rounded-xl p-3 flex justify-between items-center border border-white/10 backdrop-blur-sm">
+            <div>
+              <p class="text-[10px] text-white/70 font-bold mb-0.5">مبلغ جایزه</p>
+              <p class="font-black text-yellow-300 drop-shadow-sm">{{ formatNumber(lottery.prize_pool) }} <span class="text-[10px]">تومان</span></p>
+            </div>
+            <div class="text-left">
+              <p class="text-[10px] text-white/70 font-bold mb-0.5">تاریخ قرعه‌کشی</p>
+              <p class="font-bold text-white text-xs dir-ltr">{{ new Date(lottery.draw_time).toLocaleDateString('fa-IR') }}</p>
+            </div>
+          </div>
         </div>
       </div>
+
+      <button @click="router.push('/')" class="w-full mt-8 py-3 bg-white/20 hover:bg-white/30 text-white font-black rounded-xl border border-white/20 transition-all active:scale-95 shadow-sm">
+        بازگشت به خانه
+      </button>
 
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { useAuthStore } from '~/stores/auth'
 
-const route = useRoute()
 const router = useRouter()
-const status = route.query.status || 'wait'
+const auth = useAuthStore()
+const config = useRuntimeConfig()
 
-function navigateTo(page) {
-  router.push(page)
+const history = ref([])
+const loading = ref(true)
+
+const formatNumber = (num) => {
+  return new Intl.NumberFormat('fa-IR').format(num)
 }
-</script>
 
-<style scoped>
-/* Additional styles if needed */
-</style>
+const fetchHistory = async () => {
+  try {
+    const res = await axios.get(`${config.public.apiBase}/lottery/history`, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    history.value = res.data
+  } catch (e) {
+    console.error('Error fetching history:', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  if (auth.token) {
+    fetchHistory()
+  } else {
+    router.push('/')
+  }
+})
+</script>
