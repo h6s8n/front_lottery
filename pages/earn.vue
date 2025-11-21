@@ -219,10 +219,12 @@ const { data: tasks, pending: isLoading, refresh } = await useFetch(`${config.pu
 
 // Computed
 const filteredTasks = computed(() => {
-  if (!tasks.value) return []
-  if (activeTab.value === 'همه') return tasks.value
+  const taskList = tasks.value?.data || tasks.value || []
+  if (!taskList.length) return []
   
-  return tasks.value.filter(task => {
+  if (activeTab.value === 'همه') return taskList
+  
+  return taskList.filter(task => {
     if (activeTab.value === 'شبکه‌های اجتماعی') return ['telegram_join', 'social_link'].includes(task.type)
     if (activeTab.value === 'ویژه') return task.reward_amount > 5000
     if (activeTab.value === 'دوستان') return task.type === 'referral_count'

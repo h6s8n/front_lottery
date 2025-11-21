@@ -57,9 +57,9 @@ const { data: pageData, pending: isLoading } = await useAsyncData('profile-data'
   ])
 
   return {
-    user: userRes,
-    invitees: (inviteesRes as any).invitees,
-    referralCode: (referralRes as any).referral_code
+    user: (userRes as any).data || userRes, // UserResource wraps in data
+    invitees: (inviteesRes as any).data || [], // UserResource collection wraps in data
+    referralCode: (referralRes as any).data?.referral_code || (referralRes as any).referral_code || ''
   }
 }, {
   watch: [() => auth.token],

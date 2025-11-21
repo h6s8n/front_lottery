@@ -16,7 +16,7 @@ export const useReferral = () => {
       const res = await axios.get(`${config.public.apiBase}/user/referral-code`, {
         headers: { Authorization: `Bearer ${auth.token}` }
       })
-      const referralCode = res.data.referral_code
+      const referralCode = res.data.data?.referral_code || res.data.referral_code
       referralLink.value = `https://t.me/${botUsername}?start=${referralCode}`
     } catch (err) {
       console.error("Failed to fetch referral code:", err)
@@ -46,6 +46,8 @@ export const useReferral = () => {
     }
 
     const shareText = "بیا با هم جایزه ببریم! با لینک من تو این لاتاری باحال ثبت‌نام کن و کلی جایزه ببر:"
+    // Telegram share link format: https://t.me/share/url?url={link}&text={text}
+    // The link itself is https://t.me/LotteryAbolBot?start={code}
     const url = `https://t.me/share/url?url=${encodeURIComponent(referralLink.value)}&text=${encodeURIComponent(shareText)}`
     window.open(url, '_blank')
   }
