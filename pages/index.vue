@@ -50,8 +50,11 @@
         <!-- Points Display -->
         <div class="mb-8 text-center relative">
            <div class="absolute -inset-4 bg-white/10 blur-xl rounded-full animate-pulse-slow"></div>
-           <h1 class="text-5xl font-black text-white drop-shadow-lg tracking-tight relative z-10 flex items-center justify-center gap-2">
-             <span class="text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]">🪙</span>
+           <h1 class="text-5xl font-black text-white drop-shadow-lg tracking-tight relative z-10 flex items-center justify-center gap-3">
+             <div class="w-16 h-16 relative flex items-center justify-center rounded-full overflow-hidden border-2 border-yellow-400/60 shadow-lg bg-transparent group">
+               <div class="absolute inset-0 bg-yellow-400/10 blur-md rounded-full group-hover:bg-yellow-400/30 transition-colors"></div>
+               <img src="/coin.png" alt="Coin" class="w-full h-full object-cover filter brightness-110 transform scale-[1.45]" />
+             </div>
              {{ formatNumber(points) }}
            </h1>
            <p class="text-white/80 text-sm font-bold mt-2 bg-white/10 px-3 py-1 rounded-full inline-block backdrop-blur-sm border border-white/10">موجودی شما</p>
