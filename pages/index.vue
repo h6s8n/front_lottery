@@ -389,15 +389,50 @@ const fetchMyTickets = async () => {
 }
 
 // Handle mascot click
+// Click Sync Logic
+let pendingClicks = 0
+let syncTimeout = null
+
+const syncClicks = async () => {
+  if (pendingClicks === 0) return
+
+  const clicksToSend = pendingClicks
+  pendingClicks = 0 // Reset immediately to avoid double sending
+
+  try {
+    await axios.post(`${config.public.apiBase}/clicker/sync`, {
+      points: clicksToSend
+    }, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    // Optional: You can update points from server response if needed
+    // const res = await ...
+    // points.value = res.data.points
+  } catch (error) {
+    console.error('Failed to sync clicks:', error)
+    // Rollback points if sync fails (optional, but good UX)
+    // points.value -= clicksToSend * clickAmount.value
+    // pendingClicks += clicksToSend // Retry later?
+  }
+}
+
 const handleMascotClick = (event) => {
   if (energy.value <= 0) return
-  
+
   // Decrease energy
   energy.value = Math.max(0, energy.value - 1)
-  
-  // Add points
+
+  // Add points locally
   points.value += clickAmount.value
   
+  // Add to pending clicks
+  pendingClicks++
+
+  // Batch Sync: Send every 10 clicks
+  if (pendingClicks >= 10) {
+    syncClicks()
+  }
+
   // Visual feedback
   isClicking.value = true
   setTimeout(() => {
