@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-vazir overflow-x-hidden selection:bg-yellow-400 selection:text-black" dir="rtl">
+  <div class="min-h-screen bg-gradient-to-br from-[#FF9966] via-[#FF5E62] to-[#FF9966] text-white font-vazir overflow-x-hidden selection:bg-yellow-400 selection:text-black" dir="rtl">
     
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
@@ -148,6 +148,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+
+const auth = useAuthStore()
 
 // State
 const paymentMethod = ref('rial') // 'rial' | 'crypto'
@@ -184,26 +187,6 @@ const onSubmit = async () => {
   if (!auth.token) return
 
   try {
-    // Assuming we are converting points to tickets for now, as per the controller logic
-    // If there's a direct "buy" endpoint with crypto/rial, it would be different.
-    // But based on the request, users "convert points to tickets".
-    // However, the UI shows "Payment". 
-    // The user said "convert points to tickets" AND "buy ticket".
-    // For now, I will implement the point conversion as the "buy" mechanism if it's points-based,
-    // or just alert for real money since we don't have a gateway.
-    // BUT, the user specifically asked for "First Ticket... invite friend".
-    // This logic is in `convertPointsToTickets`.
-    // So I will assume "Buying" here means converting points for this demo, OR I should add a specific "Buy" endpoint.
-    // Given the UI has "Rial" and "Crypto", this seems like a real purchase.
-    // But the "First Ticket" rule was implemented in `convertPointsToTickets`.
-    // I'll assume for this task, we are testing the "First Ticket" rule via the "Convert" modal in Home, 
-    // OR I should wire this page to use points too?
-    // The user said "convert points to tickets" is one thing.
-    // And "First ticket... invite friend".
-    // Let's wire the "Convert" button in Home to be the main test for this.
-    // But this page `buy-card` seems to be for direct purchase.
-    // I'll leave this page as mock for now and focus on the `index.vue` convert modal which I already saw.
-    
     alert(`پرداخت ${totalPrice.value} تتر از طریق شبکه ${selectedNetwork.value.label}`)
   } catch (e) {
     console.error(e)
@@ -216,5 +199,7 @@ const onSubmitRial = () => {
 </script>
 
 <style scoped>
-/* Custom styles if needed */
+.animate-pulse-slow {
+    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 </style>

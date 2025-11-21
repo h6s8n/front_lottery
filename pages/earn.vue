@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-sans relative overflow-hidden pb-24 selection:bg-yellow-400 selection:text-black">
+  <div class="min-h-screen bg-gradient-to-br from-[#FF9966] via-[#FF5E62] to-[#FF9966] text-white font-sans relative overflow-hidden pb-24 selection:bg-yellow-400 selection:text-black">
     <!-- Background Elements -->
     <AppLoading v-if="isLoading" />
     <div class="fixed inset-0 z-0 pointer-events-none">
@@ -205,161 +205,74 @@ definePageMeta({
 
 const auth = useAuthStore()
 const config = useRuntimeConfig()
-
-// State
-const taskStates = ref({})
 const activeTab = ref('همه')
+const taskStates = ref({})
 
-// Data Fetching
-const { data: tasks, pending: isLoading, refresh } = await useFetch(`${config.public.apiBase}/tasks`, {
-  headers: { Authorization: `Bearer ${auth.token}` },
-  immediate: !!auth.token,
-  watch: [() => auth.token]
-})
+// Fetch Tasks
+const { data: tasks, pending: isLoading, refresh: refreshTasks } = await useAsyncData('tasks', () => 
+  $fetch(`${config.public.apiBase}/tasks`, {
+    headers: { Authorization: `Bearer ${auth.token}` }
+  }), {
+    lazy: true
+  }
+)
 
-// Computed
 const filteredTasks = computed(() => {
-  const taskList = tasks.value?.data || tasks.value || []
-  if (!taskList.length) return []
+  if (!tasks.value) return []
+  const allTasks = tasks.value.data || tasks.value
   
-  if (activeTab.value === 'همه') return taskList
+  if (activeTab.value === 'همه') return allTasks
+  if (activeTab.value === 'ویژه') return allTasks.filter(t => t.is_special)
+  if (activeTab.value === 'شبکه‌های اجتماعی') return allTasks.filter(t => t.category === 'social')
+  if (activeTab.value === 'دوستان') return allTasks.filter(t => t.category === 'referral')
   
-  return taskList.filter(task => {
-    if (activeTab.value === 'شبکه‌های اجتماعی') return ['telegram_join', 'social_link'].includes(task.type)
-    if (activeTab.value === 'ویژه') return task.reward_amount > 5000
-    if (activeTab.value === 'دوستان') return task.type === 'referral_count'
-    return true
-  })
+  return allTasks
 })
-
-// Methods
-const formatNumber = (num) => {
-  return new Intl.NumberFormat('fa-IR').format(num)
-}
-
-const getIcon = (iconType) => {
-  const icons = {
-    telegram: '✈️',
-    instagram: '📷',
-    youtube: '▶️',
-    twitter: '🐦',
-  }
-  return icons[iconType] || '⭐'
-}
-
-const getIconGradient = (iconType) => {
-  const gradients = {
-    telegram: 'linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)',
-    instagram: 'linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%)',
-    youtube: 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)',
-    twitter: 'linear-gradient(135deg, #1DA1F2 0%, #0C85D0 100%)',
-  }
-  return gradients[iconType] || 'linear-gradient(135deg, #FACC15 0%, #EC4899 100%)'
-}
-
-const getButtonClass = (task) => {
-  if (task.status === 'claimed') {
-    return 'bg-white/20 border border-green-400/50 text-green-100 cursor-not-allowed'
-  }
-  
-  const state = taskStates.value[task.id]
-  if (state?.loading) {
-    return 'bg-white/20 text-white cursor-wait border border-white/20'
-  }
-  if (state?.timer > 0) {
-    return 'bg-white/10 text-white/60 border border-white/10'
-  }
-  if (state?.readyToClaim) {
-    return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg shadow-green-400/30 border border-green-300/20 transform hover:scale-105'
-  }
-  
-  return 'bg-white text-pink-600 hover:bg-pink-50 shadow-lg shadow-pink-500/10 border border-white/50'
-}
-
-const getButtonText = (task) => {
-  if (task.status === 'claimed') return 'انجام شد'
-  
-  const state = taskStates.value[task.id]
-  if (state?.loading) return 'بررسی...'
-  if (state?.timer > 0) return `${state.timer}s`
-  if (state?.readyToClaim) return 'دریافت'
-  
-  return 'شروع'
-}
 
 const handleTaskAction = async (task) => {
   if (task.status === 'claimed') return
-  
-  const state = taskStates.value[task.id]
-  
-  if (state?.readyToClaim) {
-    await claimTask(task)
-    return
-  }
-  
-  await startTask(task)
-}
 
-const startTask = async (task) => {
+  // Initialize state for this task if not exists
   if (!taskStates.value[task.id]) {
-    taskStates.value[task.id] = { loading: false, timer: 0, readyToClaim: false }
+    taskStates.value[task.id] = { loading: false }
   }
-  
-  if (task.type === 'telegram_join') {
-    window.open(task.link.startsWith('@') ? `https://t.me/${task.link.substring(1)}` : task.link, '_blank')
+
+  // If not started, open link and set to pending
+  if (task.status === 'available') {
+    if (task.link) {
+      window.open(task.link, '_blank')
+    }
     
-    setTimeout(async () => {
-      taskStates.value[task.id].loading = true
-      try {
-        await axios.post(`${config.public.apiBase}/tasks/${task.id}/check`, {}, {
-          headers: { Authorization: `Bearer ${auth.token}` }
-        })
-        taskStates.value[task.id].readyToClaim = true
-      } catch (error) {
-        alert('لطفاً ابتدا عضو کانال شوید.')
-      } finally {
-        taskStates.value[task.id].loading = false
-      }
-    }, 2000)
+    // Optimistic update to 'pending' (or whatever the backend expects for "started")
+    // For now, let's assume we just verify immediately or after a delay.
+    // In a real app, we might call an endpoint to "start" the task.
     
-  } else if (task.type === 'social_link') {
-    window.open(task.link, '_blank')
-    
-    taskStates.value[task.id].timer = 20
-    const interval = setInterval(() => {
-      if (taskStates.value[task.id].timer > 0) {
-        taskStates.value[task.id].timer--
-      } else {
-        clearInterval(interval)
-        taskStates.value[task.id].readyToClaim = true
-      }
-    }, 1000)
+    // Let's try to claim/verify immediately for this demo
+    verifyTask(task)
+  } else {
+    verifyTask(task)
   }
 }
 
-const claimTask = async (task) => {
+const verifyTask = async (task) => {
   taskStates.value[task.id].loading = true
   try {
     await axios.post(`${config.public.apiBase}/tasks/${task.id}/claim`, {}, {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-    
-    alert('🎉 جایزه با موفقیت دریافت شد!')
-    refresh()
+    // Refresh tasks to get updated status
+    await refreshTasks()
+    // Update user points/tickets if needed (auth store might need refresh)
+    // auth.fetchUser() 
   } catch (error) {
-    alert('خطا در دریافت جایزه. لطفاً دوباره تلاش کنید.')
+    console.error('Task claim failed:', error)
+    alert('تایید انجام ماموریت با خطا مواجه شد. لطفا دوباره تلاش کنید.')
   } finally {
     taskStates.value[task.id].loading = false
   }
 }
-</script>
 
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
+const formatNumber = (num) => {
+  return new Intl.NumberFormat('fa-IR').format(num)
 }
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-</style>
+</script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '~/stores/auth'
 
@@ -63,7 +63,8 @@ const { data: pageData, pending: isLoading } = await useAsyncData('profile-data'
   }
 }, {
   watch: [() => auth.token],
-  immediate: !!auth.token
+  immediate: !!auth.token,
+  lazy: true
 })
 
 watch(pageData, (newData) => {
@@ -91,7 +92,7 @@ const shareOnTelegram = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#FF6B6B] via-[#FF8E8E] to-[#FFB6B6] text-white font-vazir overflow-x-hidden selection:bg-yellow-400 selection:text-black" dir="rtl">
+  <div class="min-h-screen bg-gradient-to-br from-[#FF9966] via-[#FF5E62] to-[#FF9966] text-white font-vazir overflow-x-hidden selection:bg-yellow-400 selection:text-black" dir="rtl">
     
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
