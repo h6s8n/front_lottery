@@ -83,39 +83,53 @@
            </TransitionGroup>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-4 w-full mb-8">
-           <button 
-             @click="isConvertModalOpen = true"
-             class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-black py-4 rounded-2xl shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2 border-b-4 border-yellow-600"
-           >
-             <UIcon name="i-heroicons-arrow-path" class="w-6 h-6" />
-             <span>تبدیل امتیاز</span>
-           </button>
-           
-           <button 
-             @click="shareOnTelegram"
-             class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-black py-4 rounded-2xl shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2 border-b-4 border-blue-700"
-           >
-             <UIcon name="i-heroicons-user-plus" class="w-6 h-6" />
-             <span>دعوت دوستان</span>
-           </button>
-        </div>
+        <!-- Action Buttons & Energy Bar -->
+        <div class="w-full mb-8 space-y-4">
+           <!-- Buttons Grid -->
+           <div class="grid grid-cols-2 gap-4">
+              <button 
+                @click="isConvertModalOpen = true"
+                class="bg-white/20 backdrop-blur-md hover:bg-white/25 p-4 rounded-[30px] shadow-lg flex flex-col items-center justify-center gap-3 border border-white/20 transition-all active:scale-95 h-36 group"
+              >
+                <div class="w-14 h-14 bg-pink-400/80 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <UIcon name="i-heroicons-ticket" class="w-8 h-8 text-white" />
+                </div>
+                <span class="text-white font-black text-lg drop-shadow-md">تبدیل سکه</span>
+              </button>
 
-        <!-- Energy Bar -->
-        <div class="w-full bg-black/20 backdrop-blur-md rounded-2xl p-1.5 border border-white/10 shadow-inner">
-           <div class="flex justify-between text-xs font-bold text-white mb-1 px-2">
-             <span class="flex items-center gap-1">
-               <UIcon name="i-heroicons-bolt" class="w-3 h-3 text-yellow-300" />
-               انرژی
-             </span>
-             <span>{{ formatNumber(energy) }} / {{ formatNumber(maxEnergy) }}</span>
+              <button 
+                @click="shareOnTelegram"
+                class="bg-white/20 backdrop-blur-md hover:bg-white/25 p-4 rounded-[30px] shadow-lg flex flex-col items-center justify-center gap-3 border border-white/20 transition-all active:scale-95 h-36 group"
+              >
+                <div class="w-14 h-14 bg-purple-400/80 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <UIcon name="i-heroicons-users" class="w-8 h-8 text-white" />
+                </div>
+                <span class="text-white font-black text-lg drop-shadow-md">دعوت دوستان</span>
+              </button>
            </div>
-           <div class="w-full h-3 bg-black/30 rounded-full overflow-hidden shadow-inner">
-             <div 
-               class="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(253,224,71,0.5)]"
-               :style="{ width: (energy / maxEnergy * 100) + '%' }"
-             ></div>
+
+           <!-- Energy Bar -->
+           <div class="w-full bg-white/20 backdrop-blur-md rounded-[35px] p-3 border border-white/20 shadow-lg flex items-center justify-between relative overflow-hidden">
+              <!-- Progress Fill -->
+              <div 
+                class="absolute inset-0 bg-white/5 transition-all duration-500"
+                :style="{ width: (energy / maxEnergy * 100) + '%' }"
+              ></div>
+
+              <div class="flex items-center gap-4 relative z-10 pl-2">
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white/30">
+                  <UIcon name="i-heroicons-bolt" class="w-7 h-7 text-white" />
+                </div>
+                <div class="flex flex-col">
+                   <span class="text-[10px] text-white/80 font-bold">انرژی</span>
+                   <span class="text-xl font-black text-white tracking-wider drop-shadow-md">{{ formatNumber(energy) }} <span class="text-sm text-white/60">/ {{ formatNumber(maxEnergy) }}</span></span>
+                </div>
+              </div>
+
+              <button class="bg-yellow-400 hover:bg-yellow-300 text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg flex items-center gap-2 transition-transform active:scale-95 relative z-10 mr-1">
+                <UIcon name="i-heroicons-bolt" class="w-4 h-4" />
+                <span>شارژ</span>
+              </button>
            </div>
         </div>
 
